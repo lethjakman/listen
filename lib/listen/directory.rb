@@ -3,9 +3,9 @@ module Listen
     attr_accessor :listener, :path, :options
 
     def initialize(listener, path, options = {})
-      @listener    = listener
-      @path    = path
-      @options = options
+      @listener = listener
+      @path     = path
+      @options  = options
     end
 
     def scan

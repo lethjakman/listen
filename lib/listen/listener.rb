@@ -59,7 +59,7 @@ module Listen
     #
     def unpause
       registry[:record].build
-      @paused = false
+      Thread.new { registry[:record].when_built { @paused = false } }
     end
 
     # Returns true if Listener is paused

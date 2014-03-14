@@ -12,6 +12,7 @@ module Listen
     end
 
     def change(path, options)
+      _touch_record if options[:build]
       return if _silencer.silenced?(path, options[:type])
 
       if change = options[:change]
@@ -22,6 +23,10 @@ module Listen
     end
 
     private
+
+    def _touch_record
+      listener.registry[:record].last_build_at = Time.now
+    end
 
     def _file_change(path, options)
       change = File.new(listener, path).change
