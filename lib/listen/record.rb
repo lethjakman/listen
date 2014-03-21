@@ -26,15 +26,19 @@ module Listen
     end
 
     def build
-      @last_build_at = Time.now
+      @last_build_at = nil
       @paths = _init_paths
       listener.directories.each do |path|
         listener.registry[:change_pool].change(path, type: 'Dir', recursive: true, silence: true, build: true)
       end
     end
 
+    def built!
+      @last_build_at = Time.now
+    end
+
     def when_built
-      sleep 0.01 until last_build_at + 0.01 < Time.now
+      sleep 0.01 until !last_build_at.nil? && last_build_at + 0.1 < Time.now
       yield
     end
 

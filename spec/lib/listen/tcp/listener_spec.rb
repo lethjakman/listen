@@ -9,7 +9,7 @@ describe Listen::TCP::Listener do
   let(:options) { {} }
   let(:registry) { double(Celluloid::Registry, :[]= => true) }
   let(:supervisor) { double(Celluloid::SupervisionGroup, add: true, pool: true) }
-  let(:record) { double(Listen::Record, terminate: true, build: true) }
+  let(:record) { double(Listen::Record, terminate: true, build: true, when_built: true) }
   let(:silencer) { double(Listen::Silencer, terminate: true) }
   let(:adapter) { double(Listen::Adapter::Base) }
   let(:broadcaster) { double(Listen::TCP::Broadcaster) }

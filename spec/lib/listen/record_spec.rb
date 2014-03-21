@@ -86,8 +86,26 @@ describe Listen::Record do
     end
 
     it "calls change asynchronously on all directories to build record"  do
-      expect(change_pool).to receive(:change).with('dir_path', type: 'Dir', recursive: true, silence: true)
+      expect(change_pool).to receive(:change).with('dir_path', type: 'Dir', recursive: true, silence: true, build: true)
       record.build
+    end
+  end
+
+  describe "#built!" do
+    it "touches last_build_at" do
+      record.last_build_at = nil
+      record.built!
+      expect(record.last_build_at).to be < Time.now
+    end
+  end
+
+  describe "#when_built" do
+    it "executes block when last_build_at is set and older than 0.1 seconds" do
+      record.last_build_at = nil
+      Thread.new { record.when_built { @built = true } }
+      record.last_build_at = Time.now - 0.1
+      sleep 0.01
+      expect(@built).to be_true
     end
   end
 end

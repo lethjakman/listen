@@ -5,7 +5,7 @@ describe Listen::Listener do
   let(:options) { {} }
   let(:registry) { double(Celluloid::Registry, :[]= => true) }
   let(:supervisor) { double(Celluloid::SupervisionGroup, add: true, pool: true) }
-  let(:record) { double(Listen::Record, terminate: true, build: true) }
+  let(:record) { double(Listen::Record, terminate: true, build: true, when_built: true) }
   let(:silencer) { double(Listen::Silencer, terminate: true) }
   let(:adapter) { double(Listen::Adapter::Base) }
   let(:change_pool) { double(Listen::Change, terminate: true) }
@@ -134,14 +134,20 @@ describe Listen::Listener do
   end
 
   describe "#unpause" do
+    before {
+      listener.paused = true
+      allow(record).to receive(:when_built).and_yield
+    }
+
     it "builds record" do
       expect(record).to receive(:build)
       listener.unpause
     end
 
     it "sets paused to false" do
-      record.stub(:build)
+      allow(record).to receive(:build)
       listener.unpause
+      sleep 0.01
       expect(listener.paused).to be_false
     end
   end

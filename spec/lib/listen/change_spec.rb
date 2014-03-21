@@ -4,7 +4,7 @@ describe Listen::Change do
   let(:change) { Listen::Change.new(listener) }
   let(:registry) { double(Celluloid::Registry) }
   let(:listener) { double(Listen::Listener, registry: registry, options: {}) }
-  let(:listener_changes) { double("listener_changes") }
+  let(:listener_changes) { double("listener_changes", :<< => true) }
   before {
     listener.stub(:changes) { listener_changes }
   }
@@ -12,6 +12,16 @@ describe Listen::Change do
   describe "#change" do
     let(:silencer) { double('Listen::Silencer', silenced?: false) }
     before { registry.stub(:[]).with(:silencer) { silencer } }
+
+    context "with build options" do
+      let(:record) { double('Listen::Record') }
+      before { registry.stub(:[]).with(:record) { record } }
+
+      it "calls built! on record" do
+        expect(record).to receive(:built!)
+        change.change('file_path', type: 'File', build: true, change: :modified)
+      end
+    end
 
     context "file path" do
       context "with known change" do
@@ -21,7 +31,6 @@ describe Listen::Change do
         end
 
         it "doesn't notify to listener if path is silenced" do
-          # expect(silencer).to receive(:silenced?).with('file_path', 'File').and_return(true)
           expect(silencer).to receive(:silenced?).and_return(true)
           expect(listener_changes).to_not receive(:<<)
 
