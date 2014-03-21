@@ -26,3 +26,5 @@ Desktop DB
 Desktop DF
 
 .idea
+bin
+!bin/listen
